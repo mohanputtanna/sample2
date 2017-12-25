@@ -134,7 +134,26 @@ object GameAvgRating {
   "password": "mypassword"
   }
   """
-
+    val jsonString2 = """
+  "url": "pop.yahoo.com",
+  "username": "username2",
+  "password": "mypassword2"
+  }
+  """
+    val jsonString3 = """
+  {
+  "url": "jop.yahoo.com",
+  "username": "username3",
+  "password": "mypassword3"
+  }
+  """
+    val jsonString5 = """
+  {
+  "url": "fop.yahoo.com",
+  "username": "username5",
+  "password": "mypassword5"
+  }
+  """
 
 
     val inDf = List((1,"James",jsonString),(2,"Kanye",jsonString1)).toDF("id","name","web")
@@ -156,10 +175,13 @@ object GameAvgRating {
 //  }
 
   def unionDf(df1:DataFrame,df2:DataFrame):DataFrame ={
-    df1.union(df2)git
+    df1.union(df2)
+    print("this line has been added")
   }
   def exceptDf(df1:DataFrame,df2:DataFrame):DataFrame ={
     df1.except(df2)
+    df1.union(df2)
+
   }
 
   def withColumnExample = {
