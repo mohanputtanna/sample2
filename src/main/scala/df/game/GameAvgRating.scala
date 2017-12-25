@@ -141,13 +141,6 @@ object GameAvgRating {
   "password": "mypassword3"
   }
   """
-    val jsonString4 = """
-  {
-  "url": "hop.yahoo.com",
-  "username": "username4",
-  "password": "mypassword4"
-  }
-  """
 
     val jsonString5 = """
   {
@@ -176,6 +169,7 @@ object GameAvgRating {
 
   def unionDf(df1:DataFrame,df2:DataFrame):DataFrame ={
     df1.union(df2)
+    print("this line has been added")
   }
 
   def withColumnExample = {
