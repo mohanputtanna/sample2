@@ -141,6 +141,13 @@ object GameAvgRating {
   "password": "mypassword3"
   }
   """
+    val jsonString4 = """
+  {
+  "url": "hop.yahoo.com",
+  "username": "username4",
+  "password": "mypassword4"
+  }
+  """
     val inDf = List((1,"James",jsonString),(2,"Kanye",jsonString2)).toDF("id","name","web")
 
   }
