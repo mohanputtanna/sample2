@@ -1,8 +1,11 @@
 package df.game
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.functions._
-
+import org.apache.spark.sql.functions.explode
+import org.apache.spark.sql.types._
+import org.apache.commons.lang3.math.NumberUtils
 
 object GameAvgRating {
 
@@ -13,10 +16,151 @@ object GameAvgRating {
     .option("inferSchema",true)
     .csv("/home/mohan/Dataflair/gamedata/ign.csv").cache()
 
+  case class Department(deptId : String, deptName : String)
+  case class Employee(firstName : String,lastName : String,email: String,salary : Int)
+  case class DepartmentWithEmployee(dept:Department,employees: Seq[Employee])
+  case class DepartmentEmployee(dept:Department,empl: Employee)
+
+    val department1 =  Department("00001","Mechanical")
+    val department2 =  Department("00002","Computer Science")
+    val department3 =  Department("00003","Electrical")
+    val department4 =  Department("00004","Civil")
+
+    val department_a = Department("apple","sweet")
+    val department_b = Department("apple","sour")
+    val department_c = Department("Mango","not_needed")
+    val department_d = Department("chiku","not_sweet")
+
+  val dataf1 = Seq(department_a,department_c).toDF()
+  val dataf2 = Seq(department_b,department_d).toDF()
+//    .withColumnRenamed("deptName","departName")
+
+  val dataf3 = dataf1.join(dataf2,"deptId")
+
+  val dataf4 = dataf3.select("deptId","deptName")
+  val dataf5 = dataf3.select("deptId","departName")
+
+  val dataf6 = dataf4.union(dataf5).show()
+
+
+
+    val employee1 = new Employee("Mohan","Gowda","mohan@funmail.com",20000)
+    val employee2 = new Employee("Vikas","Chauhan","vikas@funmail.com",30000)
+    val employee3 = new Employee("Nitin","Yadav","nitinyadav@funmail.com",21000)
+    val employee4 = new Employee("Philip","Alexander","philalex@funmail.com",26000)
+
+  val departmentWithEmployee1 = new DepartmentWithEmployee(department1,Seq(employee1,employee2))
+  val departmentWithEmployee2 = new DepartmentWithEmployee(department2,Seq(employee3,employee4))
+  val departmentWithEmployee3 = new DepartmentWithEmployee(department3,Seq(employee1,employee2))
+  val departmentWithEmployee4 = new DepartmentWithEmployee(department4,Seq(employee3,employee4))
+
+  val departmentWithEmployesSeq1 = Seq(departmentWithEmployee1,departmentWithEmployee2)
+  val df1 = departmentWithEmployesSeq1.toDF()
+
+  val inputString = "/home/mohan/IdeaProjects/data/parquet"
+//  deletePathIfExists(inputString)
+
+    val departmentWithEmployeeSeq2 = Seq(departmentWithEmployee3,departmentWithEmployee4)
+    val df2 = departmentWithEmployeeSeq2.toDF()
+
   def main(args: Array[String]): Unit = {
+    //    withColumnExample
+//    df1.show(2,false)
 
 
-withColumnExample
+    val uniDf = unionDf(df1,df2)
+    //    uniDf.show(5,false)
+
+
+//    uniDf.write.parquet("/home/mohan/IdeaProjects/data/parquet")
+
+    val readParquetDf = spark.read.parquet("/home/mohan/IdeaProjects/data/parquet").as[DepartmentWithEmployee]
+
+    readParquetDf.printSchema()
+//    readParquetDf.select("dept.deptId","dept.deptName","employees.firstName").show(15,false)
+//    readParquetDf.with("dept.deptId","dept.deptName","employees.firstName").show()
+
+    readParquetDf.show(1,false)
+
+    print("Number of elements => " + readParquetDf.count())
+    readParquetDf.flatMap(rec => rec.employees
+        .map(emp => (emp.firstName,emp.lastName,emp.email,emp.salary))
+    )
+//      .show()
+
+    val expDFCor = readParquetDf.withColumn("employeesData",explode($"employees")).drop($"employees")
+    expDFCor.printSchema()
+
+
+    val explodedDF = readParquetDf.explode($"employees"){
+      case Row(employee : Seq[Row]) => employee
+        .map(employee =>{
+        val firstName = employee(0).asInstanceOf[String]
+        val lastName = employee(1).asInstanceOf[String]
+        val email = employee(2).asInstanceOf[String]
+        val salary = employee(3).asInstanceOf[Int]
+      Employee(firstName,lastName,email,salary)}
+        )
+    }.cache()
+//    explodedDF.show(1,false)
+    //    print(readParquetDf:Any)
+    //    readParquetDf.flatMap{
+    //      row:Row => row.getString("Depart")
+    //
+    //    }
+
+    val ds = Seq(
+      (0, "Lorem ipsum dolor", 1.0, Array("prp1", "prp2", "prp3")))
+      .toDF("id", "text", "value", "properties")
+      .as[(Integer, String, Double, scala.List[String])]
+    print(ds:Any)
+    ds.flatMap { t =>
+      t._4.map { prp =>
+        (t._1, t._2, t._3, prp) }}
+//      .show
+
+
+    val jsonString = """
+  {
+  "url": "imap.yahoo.com",
+  "username": "myusername",
+  "password": "mypassword"
+  }
+  """
+    val jsonString2 = """
+  {
+  "url": "pop.yahoo.com",
+  "username": "username2",
+  "password": "mypassword2"
+  }
+  """
+    val jsonString3 = """
+  {
+  "url": "jop.yahoo.com",
+  "username": "username3",
+  "password": "mypassword3"
+  }
+  """
+    val inDf = List((1,"James",jsonString),(2,"Kanye",jsonString2)).toDF("id","name","web")
+
+  }
+
+//  def jsonToDataFrame(json: String, schema: StructType = null): DataFrame = {
+//    // SparkSessions are available with Spark 2.0+
+//    val reader = spark.read
+//    Option(schema).foreach(reader.schema)
+//    reader.json(sc.parallelize(Array(json)))
+//  }
+
+//  def deletePathIfExists(inputString : String):Unit = {
+//    val inputPath = new Path(inputString)
+//    val fileSystem = FileSystem.get(spark.sparkContext.hadoopConfiguration)
+//    if(fileSystem.exists(inputPath))
+//      org.apache.spark.util.Utils.getHadoopFileSystem(inputPath)
+//  }
+
+  def unionDf(df1:DataFrame,df2:DataFrame):DataFrame ={
+    df1.union(df2)
   }
 
   def withColumnExample = {
@@ -24,8 +168,8 @@ withColumnExample
       .otherwise("Not so good"))
       .drop(col("score_phrase"))
     newDf.take(5).foreach(println)
-    val newDf1 = newDf.withColumn("negAbsRating",negate(col("score"))).show(5)
-
+    val newDf1 = newDf.withColumn("negAbsRating",negate(col("score")))
+//      .show(5)
   }
 
   def isAllDigits(x: String):Boolean = x.matches("[0-9]*[.]?[0-9]*")
