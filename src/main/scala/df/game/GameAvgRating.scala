@@ -1,11 +1,8 @@
 package df.game
 
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
-import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.explode
-import org.apache.spark.sql.types._
-import org.apache.commons.lang3.math.NumberUtils
 
 object GameAvgRating {
 
@@ -67,8 +64,6 @@ object GameAvgRating {
     //    withColumnExample
 //    df1.show(2,false)
 
-
-    val uniDf = unionDf(df1,df2)
     //    uniDf.show(5,false)
 
 
@@ -174,10 +169,6 @@ object GameAvgRating {
 //      org.apache.spark.util.Utils.getHadoopFileSystem(inputPath)
 //  }
 
-  def unionDf(df1:DataFrame,df2:DataFrame):DataFrame ={
-    df1.union(df2)
-    print("this line has been added")
-  }
   def exceptDf(df1:DataFrame,df2:DataFrame):DataFrame ={
     df1.except(df2)
     df1.union(df2)
