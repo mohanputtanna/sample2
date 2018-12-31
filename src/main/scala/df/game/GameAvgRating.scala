@@ -1,5 +1,4 @@
 package df.game
-
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.explode
@@ -114,6 +113,13 @@ object GameAvgRating {
 
 
     val jsonString = """
+  {
+  "url": "imap.yahoo.com",
+  "username": "myusername",
+  "password": "mypassword"
+  }
+  """
+    val jsonString25 = """
   {
   "url": "imap.yahoo.com",
   "username": "myusername",
