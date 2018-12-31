@@ -1,11 +1,8 @@
 package df.game
 
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
-import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.explode
-import org.apache.spark.sql.types._
-import org.apache.commons.lang3.math.NumberUtils
 
 object GameAvgRating {
 
@@ -66,10 +63,6 @@ object GameAvgRating {
   def main(args: Array[String]): Unit = {
     //    withColumnExample
 //    df1.show(2,false)
-
-
-    val uniDf = unionDf(df1,df2)
-    //    uniDf.show(5,false)
 
 
 //    uniDf.write.parquet("/home/mohan/IdeaProjects/data/parquet")
@@ -160,24 +153,6 @@ object GameAvgRating {
 
   }
 
-//  def jsonToDataFrame(json: String, schema: StructType = null): DataFrame = {
-//    // SparkSessions are available with Spark 2.0+
-//    val reader = spark.read
-//    Option(schema).foreach(reader.schema)
-//    reader.json(sc.parallelize(Array(json)))
-//  }
-
-//  def deletePathIfExists(inputString : String):Unit = {
-//    val inputPath = new Path(inputString)
-//    val fileSystem = FileSystem.get(spark.sparkContext.hadoopConfiguration)
-//    if(fileSystem.exists(inputPath))
-//      org.apache.spark.util.Utils.getHadoopFileSystem(inputPath)
-//  }
-
-  def unionDf(df1:DataFrame,df2:DataFrame):DataFrame ={
-    df1.union(df2)
-    print("this line has been added")
-  }
   def exceptDf(df1:DataFrame,df2:DataFrame):DataFrame ={
     df1.except(df2)
     df1.union(df2)
