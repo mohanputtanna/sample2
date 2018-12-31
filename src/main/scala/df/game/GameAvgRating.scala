@@ -171,6 +171,7 @@ object GameAvgRating {
       .otherwise("Not so good"))
       .drop(col("score_phrase"))
     newDf.take(5).foreach(println)
+    val newDf1 = newDf.withColumn("negAbsRating",negate(col("score"))).withColumn("dummyColumn",lit("0")).withColumn("dummyColumnfromweb",lit("web"))
     val newDf1 = newDf.withColumn("negAbsRating",negate(col("score"))).withColumn("columnfromidea",lit("ideaColumn"))
 //      .show(5)
   }
