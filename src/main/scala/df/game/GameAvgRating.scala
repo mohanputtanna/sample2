@@ -16,6 +16,7 @@ object GameAvgRating {
   case class Employee(firstName : String,lastName : String,email: String,salary : Int)
   case class DepartmentWithEmployee(dept:Department,employees: Seq[Employee])
   case class DepartmentEmployee(dept:Department,empl: Employee)
+  case class DepartmentEmployee1(dept1:Department,emp2: Employee)
 
     val department1 =  Department("00001","Mechanical")
     val department2 =  Department("00002","Computer Science")
